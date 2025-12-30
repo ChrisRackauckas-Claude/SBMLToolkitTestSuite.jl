@@ -2,8 +2,8 @@ using SBMLToolkitTestSuite
 using Test
 using JSON
 
-const case_ids = [1:1822...]
-case_ids = [1]
+# Full test suite would be: case_ids = [1:1822...]
+const case_ids = [1]  # Run single case for quick CI
 
 const logdir = joinpath(@__DIR__, "logs")
 ispath(logdir) && rm(logdir, recursive = true)

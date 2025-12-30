@@ -29,11 +29,26 @@ function getcases(case_ids)
     map(x -> x[(end - 4):end], .*("0000", string.(case_ids)))
 end
 
-function setup_settings_txt(text)
+function setup_settings_txt(text::AbstractString)
     ls = split(text, "\n")
     spls = split.(ls, ": ")
     filter!(x -> length(x) == 2, spls)
-    Dict(map(x -> x[1] => Meta.parse(x[2]), spls))
+    result = Dict{String, Union{Int, Float64}}()
+    for x in spls
+        key = String(x[1])
+        val_str = String(x[2])
+        # Try parsing as Int first, then Float64 - avoids slow Meta.parse
+        int_val = tryparse(Int, val_str)
+        if int_val !== nothing
+            result[key] = int_val
+        else
+            float_val = tryparse(Float64, val_str)
+            if float_val !== nothing
+                result[key] = float_val
+            end
+        end
+    end
+    result
 end
 
 function to_concentrations(sol, ml, res_df, ia)
@@ -43,16 +58,17 @@ function to_concentrations(sol, ml, res_df, ia)
         if haskey(ml.species, sn[1:(end - 3)])
             spec = ml.species[sn[1:(end - 3)]]
             comp = ml.compartments[spec.compartment]
-            ic = spec.initial_concentration
             # isnothing(ic) || haskey(ia, sn[1:end-3]) ? push!(volumes, 1.) : push!(volumes, comp.size)
             isnothing(spec.initial_amount) ? push!(volumes, comp.size) : push!(volumes, 1.0)  # Todo: see if this line works better than the above
         else
             push!(volumes, 1.0)
         end
     end
-    sol_df = sol_df ./ Array(volumes)'
+    sol_df = sol_df ./ volumes'  # Removed unnecessary Array() call
 
-    idx = [sol.t[i] in res_df[:, 1] ? true : false for i in 1:length(sol.t)]
+    # Use Set for O(1) lookups instead of O(n*m) linear search
+    res_times = Set(res_df[:, 1])
+    idx = [t in res_times for t in sol.t]
     sol_df = sol_df[idx, :]
     rename!(sol_df, "timestamp" => "time")
     rename!(sol_df, [rstrip(n, ['(', 't', ')']) for n in names(sol_df)])

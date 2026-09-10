@@ -14,7 +14,7 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 SBML = "e5567a89-2604-4b09-9718-f5f78e97c3bb"
 SBMLToolkit = "86080e66-c8ac-44c2-a1a0-9adaadfe4a4e"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-Sundials = "6.7.1"
+Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
 
 [compat]
 Symbolics = "7.39.2"
@@ -32,7 +32,7 @@ SBMLToolkit = "0.1.32"
 SciMLBase = "3.39"
 SafeTestsets = "0.1"
 SciMLTesting = "2.4"
-Sundials = "6.1"
+Sundials = "6.7.1"
 Test = "1"
 julia = "1.10"
 
